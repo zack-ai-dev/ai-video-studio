@@ -62,7 +62,7 @@ with st.sidebar:
     st.markdown(f"[👉 **ترقية الحساب عبر PayPal**]({PAYPAL_URL})")
 
 # ==========================================
-# 4. MAIN INTERFACE (ALL TOOLS & SETTINGS)
+# 4. MAIN INTERFACE
 # ==========================================
 st.title("🎬 AI Video Studio Pro")
 st.markdown("##### المنصة العالمية الذكية لإعادة صياغة الفيديوهات، الكابشن، والدبلجة")
@@ -79,13 +79,13 @@ if st.session_state.usage_count >= FREE_LIMIT:
     st.link_button("🚀 ترقية الحساب الآن ($19)", PAYPAL_URL)
 else:
     # STEP 1: Select AI Tool
-    st.subheader("1️⃣ اختر أداة الذكاء الاصطناعي:")
+    st.subheader("1️⃣ اختر أداة الذكاء الاصطناعي المطلوبة:")
     selected_tool = st.radio(
-        "اختر الأداة المطلوبة:",
+        "اختر الأداة:",
         [
+            "💬 الكابشن الديناميكي",
             "✂️ قص الصمت التلقائي", 
             "🎯 الزووم الدرامي الذكي", 
-            "💬 الكابشن الديناميكي", 
             "🎙️ الدبلجة لـ 100+ لغة"
         ],
         horizontal=True
@@ -93,52 +93,50 @@ else:
     
     st.markdown("---")
 
-    # STEP 2: Upload Video
-    st.subheader("2️⃣ ارفع الفيديو الخاص بك:")
+    # STEP 2: Always Visible Customization Settings
+    st.subheader(f"2️⃣ إعدادات وخيارات التخصيص لـ [{selected_tool}]:")
+    
+    if selected_tool == "💬 الكابشن الديناميكي":
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            caption_color = st.color_picker("🎨 اختر لون الخط / الكابشن:", "#FFFF00")
+        with col2:
+            font_size = st.slider("📏 حجم الخط (Pixels):", min_value=16, max_value=48, value=28)
+        with col3:
+            font_style = st.selectbox("🔤 نوع وشكل الخط:", ["Impact Bold", "Arial Black", "Montserrat Heavy", "Roboto Condensed"])
+            
+    elif selected_tool == "✂️ قص الصمت التلقائي":
+        col1, col2 = st.columns(2)
+        with col1:
+            silence_thresh = st.slider("⏱️ حساسية اقتطاع الصمت (ثواني):", min_value=0.1, max_value=2.0, value=0.5, step=0.1)
+        with col2:
+            margin = st.slider("📐 الهامش بين المقاطع (ثواني):", min_value=0.0, max_value=0.5, value=0.1)
+            
+    elif selected_tool == "🎙️ الدبلجة لـ 100+ لغة":
+        col1, col2 = st.columns(2)
+        with col1:
+            target_lang = st.selectbox("🌐 لغة الدبلجة المستهدفة:", ["العربية", "English", "Español", "Français", "Deutsch", "Türkçe"])
+        with col2:
+            voice_type = st.selectbox("🎙️ نوع الصوت المعالج:", ["صوت ذكر احترافي", "صوت أنثى احترافي"])
+            
+    elif selected_tool == "🎯 الزووم الدرامي الذكي":
+        zoom_speed = st.select_slider("🎬 سرعة وشدة التركيز:", options=["هادئ", "متوسط", "سريع ودرامي"])
+
+    st.markdown("---")
+
+    # STEP 3: Upload Video
+    st.subheader("3️⃣ ارفع الفيديو الخاص بك لبدء المعالجة:")
     uploaded_file = st.file_uploader(
         f"قم برفع الفيديو (MP4, MOV, AVI):", 
         type=["mp4", "mov", "avi"]
     )
 
     if uploaded_file is not None:
-        st.success("تم رفع الفيديو بنجاح!")
+        st.success("تم استلام الفيديو بنجاح!")
         st.video(uploaded_file)
         
-        st.markdown("---")
-        # STEP 3: Specific Settings based on selected tool
-        st.subheader(f"3️⃣ إعدادات تخصيص أداة: {selected_tool}")
-        
-        if selected_tool == "💬 الكابشن الديناميكي":
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                caption_color = st.color_picker("لون الخط / الكابشن:", "#FFFF00")
-            with col2:
-                font_size = st.slider("حجم الخط (Pixels):", min_value=16, max_value=48, value=28)
-            with col3:
-                font_style = st.selectbox("نوع الخط:", ["Impact", "Arial Bold", "Roboto", "Montserrat"])
-                
-        elif selected_tool == "✂️ قص الصمت التلقائي":
-            col1, col2 = st.columns(2)
-            with col1:
-                silence_thresh = st.slider("حساسية اقتطاع الصمت (ثواني):", min_value=0.1, max_value=2.0, value=0.5, step=0.1)
-            with col2:
-                margin = st.slider("الهامش بين المقاطع (ثواني):", min_value=0.0, max_value=0.5, value=0.1)
-                
-        elif selected_tool == "🎙️ الدبلجة لـ 100+ لغة":
-            col1, col2 = st.columns(2)
-            with col1:
-                target_lang = st.selectbox("لغة الدبلجة المستهدفة:", ["العربية", "English", "Español", "Français", "Deutsch", "Türkçe"])
-            with col2:
-                voice_type = st.selectbox("نوع الصوت:", ["صوت ذكر احترافي", "صوت أنثى احترافي"])
-                
-        elif selected_tool == "🎯 الزووم الدرامي الذكي":
-            zoom_speed = st.select_slider("سرعة الشدة والتركيز:", options=["هادئ", "متوسط", "سريع ودرامي"])
-
-        st.markdown("---")
-        
-        # STEP 4: Run AI
-        if st.button(f"بدء المعالجة الآن بـ ({selected_tool})"):
-            with st.spinner("جاري تحليل الفيديو وتطبيق إعدادات الذكاء الاصطناعي..."):
+        if st.button(f"بدء المعالجة والتعديل بـ ({selected_tool})"):
+            with st.spinner("جاري تطبيق خياراتك وتعديل الفيديو بالذكاء الاصطناعي..."):
                 time.sleep(3)
                 st.session_state.usage_count += 1
                 
@@ -163,3 +161,4 @@ if st.button("إرسال التقييم"):
         st.success("شكراً لك! تم تسجيل ملاحظتك بنجاح.")
     else:
         st.warning("يرجى كتابة ملاحظة قبل الإرسال.")
+    
