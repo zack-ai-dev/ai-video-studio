@@ -1,0 +1,7 @@
+streamlit
+faster-whisper
+edge-tts
+deep-translator
+mediapipe
+opencv-python-headless
+ffmpeg-python
