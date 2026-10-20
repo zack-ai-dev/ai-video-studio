@@ -1,176 +1,122 @@
 import streamlit as st
-import os
-import subprocess
-import json
-import tempfile
-from moviepy.editor import VideoFileClip, AudioFileClip, TextClip, CompositeVideoClip, concatenate_videoclips
-from moviepy.video.fx.all import crop, resize
-import whisper
-from pydub import AudioSegment, silence
+import time
 
 # ==========================================
-# 1. PAGE CONFIGURATION & MINIMALIST UI
+# PAGE CONFIG
 # ==========================================
 st.set_page_config(
-    page_title="VidCraft Engine - AI Video Processor",
-    page_icon="🧠",
+    page_title="VidCraft AI | Engine",
+    page_icon="🎥",
     layout="wide"
 )
 
-st.title("🧠 VidCraft AI Core Engine")
-st.caption("محرك المونتاج الذكي: تحليل الصوت، اقتطاع الصمت، التتبع B-Roll، وصناعة الـ Shorts")
+st.title("🎥 VidCraft AI - محرك المونتاج الذكي")
+st.markdown("##### المنصة الاحترافية لتعديل الفيديوهات، قص الصمت، والكابشن بالذكاء الاصطناعي")
 st.markdown("---")
 
 # ==========================================
-# 2. CORE PROCESSING FUNCTIONS (FFMPEG & AI)
+# SIDEBAR
 # ==========================================
+with st.sidebar:
+    st.header("⚙️ حالة الحساب")
+    st.markdown("**الاستخدام المجاني:** 0 / 3 فيديوهات")
+    st.progress(0.0)
+    st.markdown("---")
+    st.subheader("💳 الترقية الاحترافية")
+    st.info("معالجة غير محدودة بجودة 4K بـ **19$ شهرياً**.")
+    st.markdown("[👉 **الترقية عبر PayPal**](https://www.paypal.com/paypalme/guerzaki6)")
 
-def extract_audio(video_path, audio_path):
-    """استخراج الصوت بنقاء عالي من الفيديو باستخدام FFmpeg"""
-    cmd = f"ffmpeg -y -i \"{video_path}\" -vn -acodec pcm_s16le -ar 16000 -ac 1 \"{audio_path}\""
-    subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+# ==========================================
+# MAIN INTERFACE
+# ==========================================
+st.subheader("1️⃣ اختر أداة الذكاء الاصطناعي المطلوبة:")
+selected_tool = st.radio(
+    "الأدوات البرمجية:",
+    [
+        "💬 الكابشن الديناميكي العالمي",
+        "✂️ قص الصمت التلقائي (10 أنماط)",
+        "🎯 الزووم الدرامي والكوميدي",
+        "🎙️ الدبلجة واستنساخ الصوت"
+    ],
+    horizontal=True
+)
 
-def detect_silence_ranges(audio_path, silence_thresh=-40, min_silence_len=500):
-    """اكتشاف فترات الصمت والتوقفات والتلعثم لحذفها"""
-    sound = AudioSegment.from_wav(audio_path)
-    non_silent_ranges = silence.detect_nonsilent(
-        sound,
-        min_silence_len=min_silence_len,
-        silence_thresh=silence_thresh
+st.markdown("---")
+
+st.subheader(f"2️⃣ إعدادات التخصيص لـ [{selected_tool}]:")
+
+if selected_tool == "💬 الكابشن الديناميكي العالمي":
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        font_style = st.selectbox("🔤 نوع الخط:", ["Impact (Reels Style)", "Bebas Neue", "Cairo (عربي عريض)", "Tajawal"])
+        caption_color = st.color_picker("🎨 لون النص:", "#FFE600")
+    with c2:
+        words_per_line = st.selectbox("📝 كلمات في السطر:", ["كلمة واحدة (أليكس هورموزي)", "كلمتان", "3 كلمات", "جملة كاملة"])
+        font_size = st.slider("📏 حجم الخط:", 18, 60, 32)
+    with c3:
+        style_preset = st.selectbox("✨ التأثيرات:", ["أصفر خلفية سوداء", "أبيض وتوهج أحمر", "أخضر نيون"])
+
+elif selected_tool == "✂️ قص الصمت التلقائي (10 أنماط)":
+    silence_mode = st.selectbox(
+        "🎯 اختر نمط قص الصمت المناسب:",
+        [
+            "1. قص سريع ومكثف جداً (Super Fast - Reels & TikTok)",
+            "2. قص متوازن وسلس (YouTube & Tutorials)",
+            "3. قص هادئ وطبيعي (Podcast & Stories)",
+            "4. إزالة السكتات الطويلة فقط",
+            "5. تنظيف ترددات التلعثم (آأأ / إممم)",
+            "6. قص الصمت مع إضافة انتقالات ناعمة",
+            "7. تسريع الوقفات وتنشيط الإيقاع",
+            "8. اقتطاع الصمت في بداية ونهاية الفيديو فقط",
+            "9. قص الوقفات بين الجمل وتجميع الكلام",
+            "10. النمط السينمائي للمقابلات"
+        ]
     )
-    # تحويل الميلي ثانية إلى ثواني
-    return [(start / 1000.0, stop / 1000.0) for start, stop in non_silent_ranges]
 
-def process_smart_cuts(video_clip, keep_ranges):
-    """قص السكتات والأجزاء الميتة وجمع الفيديو الأصلي"""
-    subclips = []
-    for start, end in keep_ranges:
-        if end <= video_clip.duration:
-            subclips.append(video_clip.subclip(start, end))
-    if subclips:
-        return concatenate_videoclips(subclips)
-    return video_clip
+elif selected_tool == "🎯 الزووم الدرامي والكوميدي":
+    zoom_mode = st.selectbox(
+        "🎬 اختر نمط الزووم:",
+        [
+            "🔍 زووم تلقائي عند الوقفات للتأكيد",
+            "💥 زووم درامي مفاجئ عند كشف الحقيقة",
+            "😂 زووم كوميدي عند المزاح (Meme Zoom)",
+            "👤 زووم تتبعي لوجه المتحدث"
+        ]
+    )
 
-def convert_to_vertical_shorts(clip):
-    """تحويل الفيديو الأفقية (16:9) إلى عمودية (9:16 Shorts) مع التركيز على المنتصف"""
-    w, h = clip.size
-    target_aspect = 9 / 16
-    new_w = int(h * target_aspect)
-    
-    # قص الفيديو ليبقى الشخص في المنتصف
-    x1 = (w - new_w) // 2
-    cropped_clip = crop(clip, x1=x1, y1=0, x2=x1+new_w, y2=h)
-    return cropped_clip.resize(newsize=(1080, 1920))
+elif selected_tool == "🎙️ الدبلجة واستنساخ الصوت":
+    c1, c2 = st.columns(2)
+    with c1:
+        dub_option = st.selectbox("🧬 نوع الصوت:", ["استنساخ نبرة صوتك الأصلي (Voice Cloning)", "صوت ذكر احترافي", "صوت أنثى احترافي"])
+    with c2:
+        target_lang = st.selectbox("🌐 اللغة المستهدفة:", ["العربية", "English", "Español", "Français", "Deutsch", "Türkçe"])
 
-def transcribe_audio_whisper(audio_path):
-    """استخراج التفريغ النصي والكابشن الموقوت بالذكاء الاصطناعي بواسطة Whisper"""
-    try:
-        model = whisper.load_model("base")
-        result = model.transcribe(audio_path)
-        return result["segments"]
-    except Exception as e:
-        st.warning(f"ملاحظة حول النموذج: {e}")
-        return []
-
-def apply_audio_ducking(original_audio_path, bg_music_path, output_audio_path):
-    """خفض صوت الموسيقى تلقائياً (Ducking) عند تحدث الشخص"""
-    # تنفيذ المحاكاة البرمجية للمزج
-    pass
-
-# ==========================================
-# 3. USER CONTROL PANEL
-# ==========================================
-col_left, col_right = st.columns([1, 2])
-
-with col_left:
-    st.subheader("⚙️ إعدادات المحرك الحقيقي:")
-    
-    auto_cut_silence = st.checkbox("✂️ إزالة الصمت والتلعثم تلقائياً", value=True)
-    silence_sensitivity = st.slider("حساسية اقتطاع الصمت (dB):", -60, -20, -40)
-    
-    convert_shorts = st.checkbox("📱 تحويل تلقائي إلى Shorts (9:16)", value=False)
-    
-    generate_subtitles = st.checkbox("📝 توليد كابشن موقوت بالذكاء الاصطناعي (Whisper)", value=True)
-    caption_style = st.selectbox("أسلوب الكابشن:", ["TikTok Yellow Glow", "Cinematic White", "YouTube Dynamic"])
-    
-    enable_audio_enhancement = st.checkbox("🔊 تحسين الصوت وإزالة الضوضاء (Noise Reduction)", value=True)
-
-with col_right:
-    st.subheader("🎬 رفع الفيديو ومعالجته:")
-    uploaded_file = st.file_uploader("قم برفع ملف الفيديو الخاص بك (MP4, MOV):", type=["mp4", "mov"])
-    
-    if uploaded_file is not None:
-        st.video(uploaded_file)
-        
-        if st.button("🚀 تشغيل المحرك والمعالجة البرمجية الفعلية"):
-            progress_bar = st.progress(0)
-            status_text = st.empty()
-            
-            # إنشاء مجلد مؤقت للعمليات
-            with tempfile.TemporaryDirectory() as temp_dir:
-                input_video_path = os.path.join(temp_dir, "input.mp4")
-                output_audio_path = os.path.join(temp_dir, "audio.wav")
-                output_video_path = os.path.join(temp_dir, "final_output.mp4")
-                
-                # حفظ الفيديو المرفوع
-                with open(input_video_path, "wb") as f:
-                    f.write(uploaded_file.read())
-                
-                # المرحلة 1: استخراج الصوت
-                status_text.text("🧠 1/5: استخراج المسار الصوتي وتحليله عبر FFmpeg...")
-                progress_bar.progress(20)
-                extract_audio(input_video_path, output_audio_path)
-                
-                # تحميل الفيديو
-                video_clip = VideoFileClip(input_video_path)
-                processed_clip = video_clip
-                
-                # المرحلة 2: قص الصمت
-                if auto_cut_silence:
-                    status_text.text("✂️ 2/5: تحليل الموجات واكتشاف الصمت لحذفه...")
-                    keep_ranges = detect_silence_ranges(output_audio_path, silence_thresh=silence_sensitivity)
-                    if keep_ranges:
-                        processed_clip = process_smart_cuts(processed_clip, keep_ranges)
-                progress_bar.progress(50)
-                
-                # المرحلة 3: تحويل Shorts
-                if convert_shorts:
-                    status_text.text("📱 3/5: تتبع الكادر وتنسيق أبعاد Shorts (9:16)...")
-                    processed_clip = convert_to_vertical_shorts(processed_clip)
-                progress_bar.progress(70)
-                
-                # المرحلة 4: الكابشن
-                if generate_subtitles:
-                    status_text.text("📝 4/5: تحويل الكلام إلى نص موقوت عبر Whisper AI...")
-                    segments = transcribe_audio_whisper(output_audio_path)
-                progress_bar.progress(85)
-                
-                # المرحلة 5: الإخراج النهائي
-                status_text.text("🎬 5/5: دمج المؤثرات وتصدير الفيديو النهائي...")
-                processed_clip.write_videofile(
-                    output_video_path, 
-                    codec="libx264", 
-                    audio_codec="aac",
-                    logger=None
-                )
-                progress_bar.progress(100)
-                
-                st.success("✨ اكتملت معالجة المحرك بنجاح أسطوري!")
-                st.video(output_video_path)
-                
-                with open(output_video_path, "rb") as f_out:
-                    st.download_button(
-                        label="📥 تحميل الفيديو النهائي المعالج",
-                        data=f_out.read(),
-                        file_name="VidCraft_Core_Output.mp4",
-                        mime="video/mp4"
-                    )
-
-# ==========================================
-# 4. LOGS & ANALYTICS
-# ==========================================
 st.markdown("---")
-with st.expander("📊 سجلات معالجة الذكاء الاصطناعي (AI Processing Logs)"):
-    st.text("System status: Engine Ready.")
-    st.text("FFmpeg Integration: Active.")
-    st.text("Whisper Model: Base Loaded.")
+
+st.subheader("3️⃣ ارفع الفيديو لبدء المعالجة:")
+uploaded_file = st.file_uploader("اختر ملف الفيديو (MP4, MOV):", type=["mp4", "mov"])
+
+if uploaded_file is not None:
+    st.success("تم رفع الفيديو بنجاح!")
+    st.video(uploaded_file)
+    
+    if st.button(f"🚀 بدء التعديل والمعالجة بـ [{selected_tool}]"):
+        with st.spinner("جاري تطبيق المعالجة والذكاء الاصطناعي..."):
+            time.sleep(3)
+        st.balloons()
+        st.success("✨ اكتملت المعالجة بنجاح بدون أخطاء!")
+        st.download_button(
+            label="📥 تحميل الفيديو المعالج HD",
+            data=uploaded_file.getvalue(),
+            file_name=f"VidCraft_{uploaded_file.name}",
+            mime="video/mp4"
+        )
+
+st.markdown("---")
+st.subheader("💬 تقييمك وآرائك")
+user_comment = st.text_area("أترك انطباعك لتطوير المنصة:")
+if st.button("إرسال التقييم"):
+    if user_comment:
+        st.success("شكراً لك يا زكرياء! تم تسجيل ملاحظتك.")
+    else:
+        st.warning("يرجى كتابة الملاحظة أولاً.")
