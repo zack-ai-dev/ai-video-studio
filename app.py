@@ -16,14 +16,11 @@ st.set_page_config(
 # ==========================================
 st.markdown("""
 <style>
-    /* Dark Ocean/Space Background */
     .stApp {
         background: radial-gradient(circle at 50% -20%, #1e1b4b 0%, #030712 60%, #020617 100%);
         color: #f3f4f6;
         font-family: 'Inter', system-ui, sans-serif;
     }
-
-    /* Glow Neon Header */
     .hero-container {
         text-align: center;
         padding: 35px 20px;
@@ -34,7 +31,6 @@ st.markdown("""
         box-shadow: 0 0 40px rgba(56, 189, 248, 0.15), inset 0 0 20px rgba(139, 92, 246, 0.1);
         margin-bottom: 35px;
     }
-
     .hero-title {
         font-size: 3.2rem;
         font-weight: 900;
@@ -45,14 +41,11 @@ st.markdown("""
         text-shadow: 0 0 30px rgba(56, 189, 248, 0.4);
         margin-bottom: 8px;
     }
-
     .hero-subtitle {
         color: #94a3b8;
         font-size: 1.15rem;
         font-weight: 400;
     }
-
-    /* Neon Cyber Buttons */
     .stButton>button {
         background: linear-gradient(135deg, #0284c7 0%, #6366f1 50%, #9333ea 100%);
         color: #ffffff;
@@ -65,14 +58,11 @@ st.markdown("""
         box-shadow: 0 0 25px rgba(99, 102, 241, 0.4), 0 4px 12px rgba(0, 0, 0, 0.5);
         transition: all 0.3s ease-in-out;
     }
-
     .stButton>button:hover {
         transform: translateY(-3px) scale(1.01);
         box-shadow: 0 0 35px rgba(168, 85, 247, 0.7), 0 6px 20px rgba(0, 0, 0, 0.6);
         border-color: #38bdf8;
     }
-
-    /* Floating Glassmorphism Panels */
     .glass-card {
         background: rgba(15, 23, 42, 0.75);
         backdrop-filter: blur(12px);
@@ -82,8 +72,6 @@ st.markdown("""
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         margin-bottom: 25px;
     }
-
-    /* Sidebar Styling */
     section[data-testid="stSidebar"] {
         background-color: #030712 !important;
         border-left: 1px solid rgba(255, 255, 255, 0.08);
@@ -111,8 +99,8 @@ with st.sidebar:
     
     st.markdown("---")
     st.markdown("### 💎 الباقة الاحترافية")
-    st.info("معالجة غير محدودة وبدقة 4K فائقة الجودة وبدون علامة مائية بـ **19$ شهرياً**.")
-    st.markdown(f"[👉 **الترقية الفورية عبر PayPal**]({PAYPAL_URL})")
+    st.info("معالجة غير محدودة وبدقة 4K فائقة الجودة وبدون علامة مائية بـ 19$ شهرياً.")
+    st.markdown(f"[👉 الترقية الفورية عبر PayPal]({PAYPAL_URL})")
 
 # ==========================================
 # 5. MAIN HERO HEADER
@@ -148,7 +136,6 @@ else:
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.subheader(f"2️⃣ إعدادات التخصيص والتحكم الذكي لـ [{selected_tool}]:")
     
-    # --- TOOL 1: CAPTION ---
     if selected_tool == "💬 الكابشن الديناميكي العالمي (Reels & Shorts)":
         c1, c2, c3 = st.columns(3)
         with c1:
@@ -169,7 +156,6 @@ else:
                 ["نص أصفر مع خلفية سوداء حادة", "نص أبيض وتوهج أحمر درامي", "أخضر نيون فسفوري متوهج", "نص أبيض وأصفر متناوب"]
             )
 
-    # --- TOOL 2: SILENCE CUTTER ---
     elif selected_tool == "✂️ قص الصمت التلقائي (10 خيارات أنماط)":
         silence_mode = st.selectbox(
             "🎯 اختر نمط وإيقاع قص الصمت المخصص لمحتواك من بين 10 أنماط برمجية جاهزة:",
@@ -187,7 +173,6 @@ else:
             ]
         )
 
-    # --- TOOL 3: DRAMATIC ZOOM ---
     elif selected_tool == "🎯 الزووم الدرامي والكوميدي (Meme & Action)":
         zoom_mode = st.selectbox(
             "🎬 اختر سيناريو ومحاكاة الكاميرا والزووم الذكي:",
@@ -200,7 +185,6 @@ else:
             ]
         )
 
-    # --- TOOL 4: DUBBING & VOICE CLONING ---
     elif selected_tool == "🎙️ الدبلجة واستنساخ البصمة الصوتية (Voice Cloning)":
         c1, c2 = st.columns(2)
         with c1:
@@ -252,4 +236,6 @@ st.subheader("💬 تقييم الأداء والملاحظات")
 user_comment = st.text_area("أترك انطباعك أو أي ميزة ترغب في إضافتها مستقبلاً:")
 if st.button("إرسال التقييم"):
     if user_comment:
-        st.success("تم استلام تقييمك بنجاح! شكراً لك يا زكرياء على مسا
+        st.success("تم استلام تقييمك بنجاح! شكراً لك يا زكرياء على مساهمتك.")
+    else:
+        st.warning("يرجى كتابة الملاحظة أولاً قبل الإرسال.")
